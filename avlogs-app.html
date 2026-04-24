@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#080810"/>
+<title>AVlogs — Viral Vlog Ideas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--card:#13131f;
+  --border:rgba(255,255,255,0.07);
+  --a1:#ff3cac;--a2:#784ba0;--a3:#2b86c5;
+  --text:#f0eeff;--muted:rgba(240,238,255,0.4);
+  --green:#00e676;--yellow:#ffd740;--red:#ff5252;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;position:relative;}
+
+/* ───── SPLASH ───── */
+#splash{
+  position:fixed;inset:0;z-index:1000;
+  background:#080810;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+}
+.splash-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(255,60,172,0.15) 0%,transparent 70%);
+  animation:pulse 2s ease-in-out infinite alternate;
+}
+@keyframes pulse{from{opacity:.5;}to{opacity:1;}}
+.splash-ring{
+  width:120px;height:120px;border-radius:28px;
+  background:linear-gradient(135deg,var(--a1),var(--a2),var(--a3));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#fff;
+  box-shadow:0 0 60px rgba(255,60,172,0.5),0 0 120px rgba(255,60,172,0.2);
+  animation:logoIn 0.8s cubic-bezier(.16,1,.3,1) .3s both;
+  position:relative;z-index:1;
+}
+@keyframes logoIn{from{opacity:0;transform:scale(.5) rotate(-10deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+.splash-title{
+  font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:8px;
+  background:linear-gradient(90deg,var(--a1),var(--a3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeUp .6s ease 1.1s both;position:relative;z-index:1;margin-top:16px;
+}
+.splash-by{
+  font-size:.75rem;letter-spacing:3px;color:var(--muted);
+  animation:fadeUp .6s ease 1.4s both;position:relative;z-index:1;margin-top:4px;
+}
+.splash-quote{
+  font-size:1.1rem;font-weight:700;color:var(--text);
+  text-align:center;max-width:280px;line-height:1.4;
+  animation:fadeUp .6s ease 1.7s both;position:relative;z-index:1;margin-top:24px;
+}
+.splash-quote span{color:var(--a1);}
+.splash-bar{
+  width:160px;height:2px;border-radius:99px;background:rgba(255,255,255,.08);
+  margin-top:40px;overflow:hidden;position:relative;z-index:1;
+  animation:fadeUp .4s ease 2s both;
+}
+.splash-bar-fill{
+  height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,var(--a1),var(--a3));
+  animation:load 1.8s ease 2.1s both;
+}
+@keyframes load{from{width:0%;}to{width:100%;}}
+.splash-exit{animation:splashOut .5s ease 4s both;}
+@keyframes splashOut{to{opacity:0;transform:scale(1.05);pointer-events:none;}}
+
+/* ───── PERMISSIONS SCREEN ───── */
+#permScreen{
+  position:fixed;inset:0;z-index:900;
+  background:var(--bg);display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;
+}
+.perm-card{
+  background:var(--card);border:1px solid var(--border);border-radius:24px;
+  padding:2rem;max-width:380px;width:100%;
+}
+.perm-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:.4rem;}
+.perm-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.8rem;line-height:1.5;}
+.perm-item{
+  display:flex;align-items:center;gap:14px;padding:1rem;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:10px;
+}
+.perm-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.perm-icon.cam{background:rgba(255,60,172,.15);}
+.perm-icon.mic{background:rgba(43,134,197,.15);}
+.perm-icon.file{background:rgba(0,230,118,.15);}
+.perm-info{}
+.perm-name{font-size:.9rem;font-weight:700;}
+.perm-why{font-size:.75rem;color:var(--muted);margin-top:2px;}
+.perm-status{margin-left:auto;font-size:.7rem;padding:3px 10px;border-radius:99px;border:1px solid;font-weight:600;}
+.perm-status.granted{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.08);}
+.perm-status.denied{color:var(--red);border-color:rgba(255,82,82,.3);background:rgba(255,82,82,.08);}
+.perm-status.pending{color:var(--yellow);border-color:rgba(255,215,64,.3);background:rgba(255,215,64,.08);}
+.perm-btn{
+  width:100%;padding:1rem;margin-top:1.5rem;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border:none;border-radius:14px;color:#fff;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 20px rgba(255,60,172,.3);transition:transform .15s;
+}
+.perm-btn:hover{transform:translateY(-2px);}
+
+/* ───── MAIN APP ───── */
+#app{
+  position:fixed;inset:0;z-index:100;
+  display:none;flex-direction:column;
+  overflow:hidden;
+}
+/* bg */
+#app::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(255,60,172,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,60,172,.025) 1px,transparent 1px);
+  background-size:36px 36px;pointer-events:none;
+}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.b1{width:400px;height:400px;background:rgba(255,60,172,.07);top:-100px;left:-80px;}
+.b2{width:350px;height:350px;background:rgba(43,134,197,.07);bottom:-60px;right:-60px;}
+
+/* TOP NAV */
+.topnav{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.2rem .8rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,8,16,.8);backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--a1),var(--a2),var(--a3));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#fff;
+  box-shadow:0 0 14px rgba(255,60,172,.35);
+}
+.nav-name{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-actions{display:flex;gap:8px;}
+.nav-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1rem;transition:background .15s,border-color .15s;
+}
+.nav-btn:hover{background:rgba(255,60,172,.1);border-color:rgba(255,60,172,.3);}
+
+/* BOTTOM TABS */
+.tabs{
+  display:flex;border-top:1px solid var(--border);
+  background:rgba(8,8,16,.9);backdrop-filter:blur(12px);
+  flex-shrink:0;position:relative;z-index:10;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:.7rem .5rem;cursor:pointer;gap:4px;
+  border:none;background:transparent;color:var(--muted);
+  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.5px;
+  transition:color .2s;
+}
+.tab.active{color:var(--a1);}
+.tab-icon{font-size:1.2rem;}
+.tab-indicator{height:2px;width:0;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:99px;transition:width .2s;margin-top:2px;}
+.tab.active .tab-indicator{width:20px;}
+
+/* SCREENS */
+.screen{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  position:relative;z-index:1;
+  display:none;
+  padding:1.2rem;
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active{display:block;}
+.screen::-webkit-scrollbar{width:0;}
+
+/* ── HOME SCREEN ── */
+.home-hero{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.5rem;margin-bottom:1.2rem;text-align:center;
+}
+.home-hero h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.home-hero p{font-size:.82rem;color:var(--muted);margin-top:.3rem;}
+.quick-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.2rem;}
+.chip{
+  padding:6px 14px;border-radius:99px;font-size:.78rem;font-weight:600;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .15s;letter-spacing:.3px;
+}
+.chip:hover,.chip:active{background:rgba(255,60,172,.1);border-color:rgba(255,60,172,.3);color:var(--a1);}
+.search-box{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:1.2rem;margin-bottom:1.2rem;
+}
+.search-row{display:flex;gap:8px;}
+#queryInput{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:12px;padding:.8rem 1rem;color:var(--text);
+  font-family:'Syne',sans-serif;font-size:.9rem;outline:none;
+  transition:border-color .2s;
+}
+#queryInput::placeholder{color:rgba(255,255,255,.2);}
+#queryInput:focus{border-color:rgba(255,60,172,.4);}
+#genBtn{
+  padding:.8rem 1.1rem;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border:none;border-radius:12px;color:#fff;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;
+  cursor:pointer;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(255,60,172,.3);transition:transform .15s;
+}
+#genBtn:hover{transform:translateY(-1px);}
+#genBtn:disabled{opacity:.5;transform:none;}
+.section-hd{
+  font-size:.68rem;letter-spacing:2px;color:var(--muted);font-weight:600;
+  text-transform:uppercase;margin-bottom:.8rem;
+  display:flex;align-items:center;gap:8px;
+}
+.section-hd::after{content:'';flex:1;height:1px;background:var(--border);}
+.ideas-grid{display:grid;gap:10px;}
+.idea-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1rem 1.1rem;display:flex;align-items:flex-start;gap:12px;
+  transition:border-color .2s,transform .15s;animation:slideIn .4s ease both;
+}
+.idea-card:hover{border-color:rgba(255,60,172,.25);transform:translateX(3px);}
+.idea-num{
+  width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:.72rem;color:#fff;margin-top:2px;
+}
+.idea-title{font-size:.9rem;font-weight:700;margin-bottom:3px;}
+.idea-desc{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.idea-tag{
+  display:inline-block;margin-top:6px;font-size:.65rem;letter-spacing:1px;font-weight:600;
+  padding:2px 9px;border-radius:99px;text-transform:uppercase;
+  background:rgba(43,134,197,.1);border:1px solid rgba(43,134,197,.2);color:var(--a3);
+}
+.loader{text-align:center;padding:2rem;display:none;}
+.loader.on{display:block;}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--a1);border-radius:50%;margin:0 auto .8rem;animation:spin .8s linear infinite;}
+.err{background:rgba(255,60,60,.06);border:1px solid rgba(255,60,60,.2);border-radius:12px;padding:.9rem 1.1rem;color:#ff6b6b;font-size:.85rem;display:none;margin-bottom:1rem;}
+.err.on{display:block;}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
+.empty-state div{font-size:2.5rem;margin-bottom:.8rem;opacity:.4;}
+.empty-state p{font-size:.85rem;line-height:1.6;}
+
+/* ── UPLOAD SCREEN ── */
+.upload-area{
+  background:var(--card);border:2px dashed var(--border);border-radius:20px;
+  padding:2rem;text-align:center;margin-bottom:1.2rem;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.upload-area:hover{border-color:rgba(255,60,172,.4);background:rgba(255,60,172,.04);}
+.upload-area input{display:none;}
+.upload-icon{font-size:2.5rem;margin-bottom:.8rem;opacity:.6;}
+.upload-title{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.upload-sub{font-size:.8rem;color:var(--muted);}
+.upload-types{display:flex;gap:8px;justify-content:center;margin-top:.8rem;flex-wrap:wrap;}
+.type-pill{padding:3px 12px;border-radius:99px;font-size:.7rem;font-weight:600;
+  border:1px solid var(--border);color:var(--muted);}
+.media-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.2rem;}
+.media-btn{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.2rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.media-btn:hover{border-color:rgba(255,60,172,.3);background:rgba(255,60,172,.05);}
+.media-btn-icon{font-size:1.8rem;}
+.media-btn-label{font-size:.78rem;font-weight:600;color:var(--muted);}
+#preview-area{display:none;margin-bottom:1rem;}
+#preview-area img,#preview-area video,#preview-area audio{
+  width:100%;border-radius:14px;border:1px solid var(--border);
+}
+#analyzeBtn{
+  width:100%;padding:1rem;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border:none;border-radius:14px;color:#fff;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;
+  box-shadow:0 4px 20px rgba(255,60,172,.3);transition:transform .15s;display:none;
+}
+#analyzeBtn:hover{transform:translateY(-2px);}
+#analyzeBtn:disabled{opacity:.5;transform:none;}
+#upload-results{margin-top:1.2rem;}
+
+/* ── HELP SCREEN ── */
+.help-header{
+  background:linear-gradient(135deg,rgba(255,60,172,.15),rgba(43,134,197,.1));
+  border:1px solid rgba(255,60,172,.15);border-radius:20px;
+  padding:1.5rem;margin-bottom:1.2rem;text-align:center;
+}
+.help-header h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:.3rem;}
+.help-header p{font-size:.82rem;color:var(--muted);}
+.faq-item{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  margin-bottom:8px;overflow:hidden;
+}
+.faq-q{
+  padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;font-weight:600;font-size:.88rem;
+}
+.faq-q span{transition:transform .2s;}
+.faq-q.open span{transform:rotate(90deg);}
+.faq-a{padding:0 1.1rem;max-height:0;overflow:hidden;transition:max-height .3s,padding .2s;}
+.faq-a.open{max-height:200px;padding:.8rem 1.1rem;}
+.faq-a p{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1.2rem;}
+.tip-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1rem;text-align:center;
+}
+.tip-icon{font-size:1.5rem;margin-bottom:.4rem;}
+.tip-title{font-size:.8rem;font-weight:700;margin-bottom:.2rem;}
+.tip-desc{font-size:.72rem;color:var(--muted);line-height:1.4;}
+.contact-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1.2rem;margin-top:1.2rem;display:flex;align-items:center;gap:12px;
+}
+.contact-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.contact-info{}
+.contact-name{font-size:.88rem;font-weight:700;}
+.contact-handle{font-size:.75rem;color:var(--muted);}
+.contact-link{margin-left:auto;padding:6px 14px;border-radius:99px;font-size:.75rem;font-weight:600;border:1px solid rgba(255,60,172,.3);color:var(--a1);background:rgba(255,60,172,.08);text-decoration:none;white-space:nowrap;}
+
+/* MODAL */
+#modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;}
+#modal.on{display:flex;}
+.modal-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:24px 24px 0 0;
+  padding:1.5rem;width:100%;max-width:480px;
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:3px;background:var(--border);border-radius:99px;margin:0 auto 1rem;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:1rem;}
+.modal-close{
+  float:right;background:rgba(255,255,255,.06);border:none;color:var(--muted);
+  width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;margin-top:-4px;
+}
+
+/* UTILS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" class="splash-exit">
+  <div class="splash-bg"></div>
+  <div class="splash-ring">AV</div>
+  <div class="splash-title">AVlogs</div>
+  <div class="splash-by">PRESENTED BY ASHVLOGIX</div>
+  <div class="splash-quote">"<span>Viral Vlog Ideas</span>,<br/>One Search Away."</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- PERMISSIONS -->
+<div id="permScreen">
+  <div class="perm-card">
+    <div class="perm-title">Quick Setup</div>
+    <div class="perm-sub">AVlogs needs a few permissions to give you the full experience — image analysis, voice search & video ideas.</div>
+
+    <div class="perm-item">
+      <div class="perm-icon cam">📷</div>
+      <div class="perm-info">
+        <div class="perm-name">Camera & Photos</div>
+        <div class="perm-why">Upload photos to get content ideas</div>
+      </div>
+      <div class="perm-status pending" id="pCam">Pending</div>
+    </div>
+    <div class="perm-item">
+      <div class="perm-icon mic">🎙️</div>
+      <div class="perm-info">
+        <div class="perm-name">Microphone</div>
+        <div class="perm-why">Voice search for vlog ideas</div>
+      </div>
+      <div class="perm-status pending" id="pMic">Pending</div>
+    </div>
+    <div class="perm-item">
+      <div class="perm-icon file">📁</div>
+      <div class="perm-info">
+        <div class="perm-name">Files & Media</div>
+        <div class="perm-why">Upload audio & video for analysis</div>
+      </div>
+      <div class="perm-status granted" id="pFile">Ready</div>
+    </div>
+
+    <button class="perm-btn" onclick="requestPerms()">Grant Permissions & Continue</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <div class="nav-logo">
+      <div class="nav-icon">AV</div>
+      <div class="nav-name">AVlogs</div>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-btn" onclick="openModal('voice')" title="Voice Search">🎙️</div>
+      <div class="nav-btn" onclick="openModal('info')" title="About">ℹ️</div>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="home-hero">
+      <h2>Find Your Next Viral Idea</h2>
+      <p>AI-powered vlog ideas for every creator</p>
+    </div>
+
+    <div class="quick-chips">
+      <div class="chip" onclick="qs('travel')">✈️ Travel</div>
+      <div class="chip" onclick="qs('food')">🍜 Food</div>
+      <div class="chip" onclick="qs('fitness')">💪 Fitness</div>
+      <div class="chip" onclick="qs('day in my life')">☀️ Daily</div>
+      <div class="chip" onclick="qs('tech')">💻 Tech</div>
+      <div class="chip" onclick="qs('fashion')">👗 Fashion</div>
+      <div class="chip" onclick="qs('gaming')">🎮 Gaming</div>
+      <div class="chip" onclick="qs('budget')">💰 Budget</div>
+      <div class="chip" onclick="qs('comedy')">😂 Comedy</div>
+      <div class="chip" onclick="qs('motivation')">🔥 Motivation</div>
+    </div>
+
+    <div class="search-box">
+      <div class="search-row">
+        <input id="queryInput" type="text" placeholder="What do you want to vlog about?"/>
+        <button id="genBtn" onclick="genIdeas()">Generate ✦</button>
+      </div>
+    </div>
+
+    <div class="err" id="homeErr"></div>
+    <div class="loader" id="homeLoader">
+      <div class="spinner"></div>
+      <p style="font-size:.8rem;color:var(--muted);">Generating fresh ideas...</p>
+    </div>
+    <div id="homeResults">
+      <div class="empty-state">
+        <div>🎬</div>
+        <p>Search any topic or tap a category<br/>to get 8 unique AI-powered vlog ideas!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="screen" id="s-upload">
+    <div class="section-hd">Upload Media for Ideas</div>
+
+    <div class="media-btns">
+      <div class="media-btn" onclick="triggerCapture('camera')">
+        <div class="media-btn-icon">📷</div>
+        <div class="media-btn-label">Take Photo</div>
+      </div>
+      <div class="media-btn" onclick="triggerCapture('video')">
+        <div class="media-btn-icon">🎬</div>
+        <div class="media-btn-label">Record Video</div>
+      </div>
+      <div class="media-btn" onclick="triggerCapture('audio')">
+        <div class="media-btn-icon">🎙️</div>
+        <div class="media-btn-label">Record Audio</div>
+      </div>
+      <div class="media-btn" onclick="triggerUpload()">
+        <div class="media-btn-icon">📁</div>
+        <div class="media-btn-label">Upload File</div>
+      </div>
+    </div>
+
+    <div class="upload-area" onclick="triggerUpload()">
+      <input type="file" id="fileInput" accept="image/*,video/*,audio/*" onchange="handleFile(event)"/>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(event)"/>
+      <input type="file" id="videoInput" accept="video/*" capture="environment" onchange="handleFile(event)"/>
+      <input type="file" id="audioInput" accept="audio/*" capture="microphone" onchange="handleFile(event)"/>
+      <div class="upload-icon">☁️</div>
+      <div class="upload-title">Drop or tap to upload</div>
+      <div class="upload-sub">Get AI-powered vlog ideas from your media</div>
+      <div class="upload-types">
+        <span class="type-pill">JPG/PNG</span>
+        <span class="type-pill">MP4/MOV</span>
+        <span class="type-pill">MP3/WAV</span>
+      </div>
+    </div>
+
+    <div id="preview-area"></div>
+    <button id="analyzeBtn" onclick="analyzeMedia()">✦ Get Vlog Ideas from This</button>
+
+    <div class="err" id="uploadErr"></div>
+    <div class="loader" id="uploadLoader">
+      <div class="spinner"></div>
+      <p style="font-size:.8rem;color:var(--muted);">Analyzing your media...</p>
+    </div>
+    <div id="upload-results"></div>
+  </div>
+
+  <!-- HELP -->
+  <div class="screen" id="s-help">
+    <div class="help-header">
+      <h2>Help & Tips</h2>
+      <p>Everything you need to know about AVlogs</p>
+    </div>
+
+    <div class="section-hd">Frequently Asked</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I get vlog ideas? <span>›</span></div>
+      <div class="faq-a"><p>Go to the Home tab, type any topic (like "travel", "cooking", "fitness") and tap Generate. You'll instantly get 8 unique AI-powered vlog ideas!</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I upload a photo to get ideas? <span>›</span></div>
+      <div class="faq-a"><p>Yes! Go to the Upload tab, take a photo or upload an image, then tap "Get Vlog Ideas from This". The AI will analyze your image and suggest relevant vlog content.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Does audio/video upload work? <span>›</span></div>
+      <div class="faq-a"><p>Yes! Upload audio or video files in the Upload tab. The AI will understand the context and suggest creative vlog ideas based on your content.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Why does the app ask for permissions? <span>›</span></div>
+      <div class="faq-a"><p>Camera permission lets you take photos directly in the app. Microphone lets you use voice search. These are optional — you can skip and still use all features.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I use the voice search? <span>›</span></div>
+      <div class="faq-a"><p>Tap the 🎙️ microphone icon in the top right. Speak your topic and it will auto-fill the search box and generate ideas for you!</p></div>
+    </div>
+
+    <div class="section-hd" style="margin-top:1.5rem;">Pro Tips</div>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-icon">🎯</div><div class="tip-title">Be Specific</div><div class="tip-desc">Try "budget travel India" instead of just "travel"</div></div>
+      <div class="tip-card"><div class="tip-icon">🔁</div><div class="tip-title">Regenerate</div><div class="tip-desc">Hit Generate again on same topic for new ideas</div></div>
+      <div class="tip-card"><div class="tip-icon">📸</div><div class="tip-title">Use Photos</div><div class="tip-desc">Upload a location photo for hyper-relevant ideas</div></div>
+      <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-title">Quick Chips</div><div class="tip-desc">Tap category chips for instant idea bursts</div></div>
+    </div>
+
+    <div class="section-hd" style="margin-top:1.5rem;">Creator</div>
+    <div class="contact-card">
+      <div class="contact-icon">📷</div>
+      <div class="contact-info">
+        <div class="contact-name">Ash Vlogix</div>
+        <div class="contact-handle">@ashvlogix</div>
+      </div>
+      <a class="contact-link" href="https://instagram.com/ashvlogix" target="_blank">Follow</a>
+    </div>
+  </div>
+
+  <!-- BOTTOM TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('home',this)">
+      <span class="tab-icon">🏠</span>
+      <span>Home</span>
+      <div class="tab-indicator"></div>
+    </button>
+    <button class="tab" onclick="switchTab('upload',this)">
+      <span class="tab-icon">📤</span>
+      <span>Upload</span>
+      <div class="tab-indicator"></div>
+    </button>
+    <button class="tab" onclick="switchTab('help',this)">
+      <span class="tab-icon">❓</span>
+      <span>Help</span>
+      <div class="tab-indicator"></div>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" onclick="closeModal(event)">
+  <div class="modal-card" id="modalCard">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const API = "https://api.anthropic.com/v1/messages";
+let currentFile = null, currentFileType = null;
+
+/* ── SPLASH → PERMS → APP ── */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('permScreen').style.display = 'flex';
+  }, 4200);
+});
+
+async function requestPerms() {
+  // Mic
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({audio:true});
+    s.getTracks().forEach(t=>t.stop());
+    setPermStatus('pMic','granted','Granted');
+  } catch { setPermStatus('pMic','denied','Denied'); }
+  // Camera
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({video:true});
+    s.getTracks().forEach(t=>t.stop());
+    setPermStatus('pCam','granted','Granted');
+  } catch { setPermStatus('pCam','denied','Denied'); }
+  setTimeout(launchApp, 800);
+}
+function setPermStatus(id,cls,txt){
+  const el=document.getElementById(id);
+  el.className='perm-status '+cls;el.textContent=txt;
+}
+function launchApp(){
+  document.getElementById('permScreen').style.display='none';
+  document.getElementById('app').style.display='flex';
+}
+
+/* ── TABS ── */
+function switchTab(name, el) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+/* ── HOME IDEAS ── */
+async function genIdeas(q) {
+  const query = q || document.getElementById('queryInput').value.trim();
+  if (!query) { document.getElementById('queryInput').focus(); return; }
+  const btn=document.getElementById('genBtn'),loader=document.getElementById('homeLoader'),
+    results=document.getElementById('homeResults'),err=document.getElementById('homeErr');
+  btn.disabled=true;btn.textContent='...';loader.classList.add('on');
+  results.innerHTML='';err.classList.remove('on');
+  try {
+    const res = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',
+        content:`Generate exactly 8 unique, creative vlog ideas about: "${query}". Return ONLY a JSON array, no markdown, no extra text. Each object: {"title":"catchy title max 10 words","description":"1-2 sentence hook","tag":"one word"}`}]})});
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'';
+    const ideas=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    loader.classList.remove('on');
+    renderIdeas(ideas,query,'homeResults');
+  } catch(e) {
+    loader.classList.remove('on');
+    err.textContent='⚠️ Could not generate ideas. Please try again.';err.classList.add('on');
+  } finally { btn.disabled=false;btn.textContent='Generate ✦'; }
+}
+
+function qs(t){ document.getElementById('queryInput').value=t; genIdeas(t); }
+
+function renderIdeas(ideas,query,targetId) {
+  const el=document.getElementById(targetId);
+  if(!ideas||!ideas.length){el.innerHTML='<div class="empty-state"><div>😕</div><p>No ideas found. Try a different topic!</p></div>';return;}
+  let h=`<div class="section-hd">8 ideas for "${esc(query)}"</div><div class="ideas-grid">`;
+  ideas.forEach((idea,i)=>{
+    h+=`<div class="idea-card" style="animation-delay:${i*.06}s">
+      <div class="idea-num">${String(i+1).padStart(2,'0')}</div>
+      <div><div class="idea-title">${esc(idea.title)}</div>
+      <div class="idea-desc">${esc(idea.description)}</div>
+      ${idea.tag?`<span class="idea-tag">${esc(idea.tag)}</span>`:''}
+      </div></div>`;
+  });
+  el.innerHTML=h+'</div>';
+}
+
+/* ── UPLOAD ── */
+function triggerUpload(){ document.getElementById('fileInput').click(); }
+function triggerCapture(type){
+  if(type==='camera') document.getElementById('cameraInput').click();
+  else if(type==='video') document.getElementById('videoInput').click();
+  else if(type==='audio') document.getElementById('audioInput').click();
+}
+
+function handleFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  currentFile=file;
+  currentFileType=file.type.split('/')[0];
+  const pa=document.getElementById('preview-area');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(currentFileType==='image') pa.innerHTML=`<img src="${ev.target.result}" style="max-height:260px;object-fit:cover;"/>`;
+    else if(currentFileType==='video') pa.innerHTML=`<video src="${ev.target.result}" controls style="max-height:260px;"></video>`;
+    else if(currentFileType==='audio') pa.innerHTML=`<audio src="${ev.target.result}" controls style="width:100%;margin-top:.5rem;"></audio>`;
+    pa.style.display='block';
+    document.getElementById('analyzeBtn').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeMedia(){
+  if(!currentFile) return;
+  const btn=document.getElementById('analyzeBtn'),loader=document.getElementById('uploadLoader'),
+    results=document.getElementById('upload-results'),err=document.getElementById('uploadErr');
+  btn.disabled=true;btn.textContent='Analyzing...';loader.classList.add('on');
+  results.innerHTML='';err.classList.remove('on');
+
+  try {
+    let messages;
+    if(currentFileType==='image'){
+      const b64=await toBase64(currentFile);
+      messages=[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:currentFile.type,data:b64}},
+        {type:'text',text:'Look at this image and generate 6 unique creative vlog ideas inspired by it. Return ONLY a JSON array: [{"title":"...","description":"...","tag":"..."}]'}
+      ]}];
+    } else {
+      messages=[{role:'user',content:`I have a ${currentFileType} file named "${currentFile.name}". Based on its name and type, generate 6 unique vlog ideas. Return ONLY a JSON array: [{"title":"...","description":"...","tag":"..."}]`}];
+    }
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages})});
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'';
+    const ideas=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    loader.classList.remove('on');
+    renderIdeas(ideas,'your media','upload-results');
+  } catch(e){
+    loader.classList.remove('on');
+    err.textContent='⚠️ Could not analyze. Try a different file.';err.classList.add('on');
+  } finally { btn.disabled=false;btn.textContent='✦ Get Vlog Ideas from This'; }
+}
+
+function toBase64(file){ return new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result.split(',')[1]);rd.readAsDataURL(file);}); }
+
+/* ── FAQ ── */
+function toggleFaq(el){
+  const a=el.nextElementSibling;
+  el.classList.toggle('open');a.classList.toggle('open');
+}
+
+/* ── MODAL ── */
+function openModal(type){
+  const mc=document.getElementById('modalContent');
+  if(type==='voice'){
+    mc.innerHTML=`<div class="modal-title">Voice Search 🎙️</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.2rem;">Tap the mic and speak your vlog topic!</p>
+      <button onclick="startVoice()" style="width:100%;padding:1rem;background:linear-gradient(135deg,var(--a1),var(--a2));border:none;border-radius:14px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;">🎙️ Start Listening</button>
+      <div id="voiceStatus" style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--muted);"></div>`;
+  } else {
+    mc.innerHTML=`<div class="modal-title">About AVlogs</div>
+      <p style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">AVlogs is your AI-powered vlog idea engine. Get 8 unique, creative ideas for any topic instantly.</p>
+      <p style="font-size:.78rem;color:var(--muted);">Made with ❤️ by <strong style="color:var(--text);">@ashvlogix</strong></p>
+      <p style="font-size:.72rem;color:rgba(255,255,255,.2);margin-top:.5rem;">Version 1.0 • Powered by Claude AI</p>`;
+  }
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal')) document.getElementById('modal').classList.remove('on');
+}
+
+/* ── VOICE ── */
+function startVoice(){
+  const st=document.getElementById('voiceStatus');
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    st.textContent='Voice not supported on this browser.';return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const r=new SR();r.lang='en-IN';r.interimResults=false;r.maxAlternatives=1;
+  st.textContent='🔴 Listening... speak now!';
+  r.start();
+  r.onresult=e=>{
+    const t=e.results[0][0].transcript;
+    st.textContent=`Heard: "${t}"`;
+    document.getElementById('queryInput').value=t;
+    document.getElementById('modal').classList.remove('on');
+    setTimeout(()=>{ switchTab('home',document.querySelector('.tab')); genIdeas(t); },400);
+  };
+  r.onerror=()=>{ st.textContent='Could not hear. Try again.'; };
+}
+
+/* ── UTILS ── */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+document.getElementById('queryInput').addEventListener('keydown',e=>{ if(e.key==='Enter') genIdeas(); });
+</script>
+</body>
+</html>
